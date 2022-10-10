@@ -1,7 +1,13 @@
-export default {
-  create: ({ payload }) => HTTPClient.post('/users', payload),
+import { auth } from '../utils/firebase'
+import {
+  onAuthStateChanged,
+  signInWithEmailAndPassword,
+  signOut
+} from 'firebase/auth'
+import { computed, onMounted, onUnmounted, ref } from 'vue'
 
-  etUserState: () =>
+export default {
+  getUserState: () =>
     new Promise((resolve, reject) => {
       onAuthStateChanged(auth, resolve, reject)
     }),
@@ -25,16 +31,13 @@ export default {
     return { user, error, loggedIn }
   },
 
-  loginWithGoogle: async () => {
-    const provider = new GoogleAuthProvider()
-    return signInWithPopup(auth, provider)
-  },
+  // loginWithGoogle: async () => {
+  //   const provider = new GoogleAuthProvider()
+  //   return signInWithPopup(auth, provider)
+  // },
 
-  loginWithEmailAndPassword: async (email, password) => {
-    return await signInWithEmailAndPassword(auth, email, password)
-  },
+  loginWithEmailAndPassword: async (email, password) =>
+    signInWithEmailAndPassword(auth, email, password),
 
-  logoutUser: async () => {
-    return await signOut(auth)
-  }
+  logoutUser: async () => signOut(auth)
 }

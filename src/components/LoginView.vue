@@ -1,4 +1,27 @@
-<script setup></script>
+<script setup>
+import { ref } from 'vue'
+import { useRouter } from 'vue-router'
+import { auth } from '../services'
+
+const router = useRouter()
+
+const loading = ref(false)
+
+const email = ref('secretariaffufrj@gmail.com')
+const password = ref('@farmacia1937')
+
+const handleSubmit = async () => {
+  loading.value = true
+  try {
+    await auth.loginWithEmailAndPassword(email.value, password.value)
+    router.replace({ name: 'admin' })
+  } catch (error) {
+    console.log(error)
+  } finally {
+    loading.value = false
+  }
+}
+</script>
 <template>
   <div class="hero min-h-screen bg-base-200">
     <div class="hero-content">
@@ -8,29 +31,38 @@
           <p class="text-center my-4">
             Acesso exclusivo da Coordenação e Secretaria Acadêmica de graduação
           </p>
-          <div class="form-control">
-            <label class="label">
-              <span class="label-text">Email</span>
-            </label>
-            <input
-              type="text"
-              placeholder="email"
-              class="input input-bordered"
-            />
-          </div>
-          <div class="form-control">
-            <label class="label">
-              <span class="label-text">Password</span>
-            </label>
-            <input
-              type="text"
-              placeholder="password"
-              class="input input-bordered"
-            />
+          <form @submit.prevent="handleSubmit">
+            <div class="form-control">
+              <label class="label">
+                <span class="label-text">E-mail</span>
+              </label>
+              <input
+                type="eamil"
+                class="input input-bordered"
+                required
+                v-model="email"
+              />
             </div>
-          <div class="form-control mt-6">
-            <button class="btn btn-primary">Login</button>
-          </div>
+            <div class="form-control">
+              <label class="label">
+                <span class="label-text">Senha</span>
+              </label>
+              <input
+                type="password"
+                class="input input-bordered"
+                v-model="password"
+              />
+            </div>
+            <div class="form-control mt-6">
+              <button
+                type="submit"
+                class="btn btn-primary"
+                :class="loading && 'loading'"
+              >
+                Entrar
+              </button>
+            </div>
+          </form>
         </div>
       </div>
     </div>

@@ -1,4 +1,61 @@
-<script setup></script>
+<script setup>
+import { onMounted, ref } from 'vue'
+import { orders } from '../services'
+import { settings } from '../services'
+import { getCurrentDate } from '../utils/date'
+import { nanoid } from 'nanoid'
+import { useRoute, useRouter } from 'vue-router'
+
+const router = useRouter()
+const route = useRoute()
+
+const order = ref({})
+const setting = ref(null)
+const loading = ref(false)
+const file = ref(null)
+
+onMounted(async () => {
+  setting.value = await settings.find()
+  route.params.id
+    ? (order.value = await orders.find(route.params.id))
+    : (order.value = {
+        course: '',
+        register: '',
+        name: '',
+        email: '',
+        problems: [],
+        justification: '',
+        term: false,
+        status: 'Aguardando',
+        created_at: getCurrentDate(),
+        code: nanoid(6),
+        opinio: '',
+        responsible: '',
+        provided: ''
+      })
+})
+
+const handleFileUpload = async e => {
+  file.value = e.target.files[0]
+}
+
+const handleSubmit = async () => {
+  loading.value = true
+  try {
+    const url = await orders.upload(file.value, order.value.code)
+    order.value.url = url
+    order.value.name = order.value.name.toUpperCase()
+    const result = route.params.id
+      ? await orders.update(order.value, route.params.id)
+      : await orders.create(order.value)
+    router.replace({ name: 'success', params: { id: result } })
+  } catch (error) {
+    console.log(error)
+  } finally {
+    loading.value = false
+  }
+}
+</script>
 <template>
   <div class="max-w-screen-md mx-auto px-4 py-12">
     <div class="flex items-center justify-between">
@@ -8,7 +65,10 @@
       </RouterLink>
     </div>
 
-    <div class="alert alert-success shadow-lg mb-6">
+    <div
+      v-if="order.status !== 'Aguardando'"
+      class="alert alert-success shadow-lg mb-6"
+    >
       <div>
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -24,18 +84,25 @@
           />
         </svg>
         <span>
-          Sua solicitação foi recebida e aguarda o parecer da coordenação.
+          <p class="text-lg font-bold">
+            {{ order.status }}
+          </p>
+          <p v-if="order.opinio">{{ order.opinio }}</p>
         </span>
       </div>
     </div>
 
-    <form @submit.prevent="">
+    <form @submit.prevent="handleSubmit">
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
         <div class="form-control">
           <label class="label">
             <span class="label-text">Curso</span>
           </label>
-          <select class="select select-bordered" required>
+          <select
+            class="select select-bordered"
+            v-model="order.course"
+            required
+          >
             <option disabled selected>Selecione o curso</option>
             <option>Integral</option>
             <option>Noturno</option>
@@ -45,7 +112,13 @@
           <label class="label">
             <span class="label-text">DRE</span>
           </label>
-          <input type="text" placeholder="DRE" class="input input-bordered" />
+          <input
+            type="text"
+            placeholder="DRE"
+            class="input input-bordered"
+            v-model="order.register"
+            required
+          />
         </div>
         <div class="form-control">
           <label class="label">
@@ -55,16 +128,25 @@
             type="text"
             placeholder="Nome completo"
             class="input input-bordered"
+            v-model="order.name"
+            required
           />
         </div>
         <div class="form-control">
           <label class="label">
             <span class="label-text">Email</span>
           </label>
-          <input type="text" placeholder="email" class="input input-bordered" />
+          <input
+            type="text"
+            placeholder="email"
+            class="input input-bordered"
+            v-model="order.email"
+            required
+          />
         </div>
 
         <fieldset
+          v-if="setting"
           class="py-4 px-2 mb-4 border border-base-300 rounded-md col-span-2"
         >
           <legend class="text-content text-sm font-semibold px-2">
@@ -72,23 +154,33 @@
           </legend>
           <div
             class="form-control mb-4"
-            v-for="label in ['Falta requisito', 'Mais de 32']"
-            :key="label"
+            v-for="item in setting.problems"
+            :key="item.title"
           >
             <label class="label cursor-pointer">
               <div class="label-text font-medium">
-                <span>{{ label }}</span>
-                <small class="px-4 block"
-                  >Lorem ipsum dolor sit amet consectetur, adipisicing elit. At
-                  exercitationem voluptates repellendus necessitatibus. Hic
-                  eius, quas mollitia impedit modi dolores? Et error dolores
-                  odit quasi accusamus, nulla illo reprehenderit animi!</small
-                >
+                <span>{{ item.title }}</span>
+                <small class="px-4 block">{{ item.description }}</small>
               </div>
-              <input type="checkbox" class="checkbox" :value="label" />
+              <input
+                type="checkbox"
+                class="checkbox"
+                :value="item.title"
+                v-model="order.problems"
+              />
             </label>
           </div>
         </fieldset>
+        <div class="form-control sm:col-span-2">
+          <label class="label cursor-pointer">
+            <span class="label-text"
+              >Atesto que li, entendi as instruções e estou ciente dos prazos
+              para os procedimentos relativos a inscrição em disciplinas e sua
+              eventual regularização:
+            </span>
+            <input type="checkbox" class="checkbox" v-model="order.term" />
+          </label>
+        </div>
 
         <div class="form-control sm:col-span-2">
           <label class="label">
@@ -100,27 +192,51 @@
           <textarea
             class="textarea textarea-bordered w-full"
             placeholder="Jusquifique o parecer"
+            v-model="order.justification"
           ></textarea>
         </div>
+
         <div class="form-control sm:col-span-2">
-          <label class="label cursor-pointer">
-            <span class="label-text"
-              >Atesto que li, entendi as instruções e estou ciente dos prazos
-              para os procedimentos relativos a inscrição em disciplinas e sua
-              eventual regularização:
+          <a
+            v-if="order.url"
+            :href="order.url"
+            class="btn btn-link"
+            target="_blank"
+            rel="noopener noreferrer"
+            >Visualizar CRID</a
+          >
+          <label class="label">
+            <span class="label-text">
+              Anexe sua CRID mais recente (contendo as irregularidades)
             </span>
-            <input type="checkbox" class="checkbox" />
+          </label>
+          <label class="block">
+            <span class="sr-only">Choose profile photo</span>
+            <input
+              accept="application/pdf"
+              @change="handleFileUpload"
+              type="file"
+              class="block w-full text-sm file:mr-4 file:btn file:btn-primary file:btn-outline"
+            />
           </label>
         </div>
+
         <div class="py-4 sm:col-span-2">
           <button
             type="submit"
-            @click="handleSubmit"
-            class="btn btn-primary px-6"
+            class="btn btn-primary px-6 disabled:cursor-not-allowed"
+            :class="loading && 'loading'"
+            v-if="order.status && order.status === 'Aguardando'"
+            :disabled="!order.term"
           >
             Salvar
           </button>
-          <div class="alert alert-warning shadow-lg mt-2">
+
+          <!-- alert -->
+          <div
+            v-if="order.status && order.status !== 'Aguardando'"
+            class="alert alert-warning shadow-lg mt-2"
+          >
             <div>
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -135,10 +251,10 @@
                   d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
                 />
               </svg>
-              <span
-                >Sua solicitação já foi analisada pela coordenaçao. Não é
-                possível alterar as informações.</span
-              >
+              <span>
+                Sua solicitação foi analisada pela coordenaçao. Não é possível
+                alterar as informações.
+              </span>
             </div>
           </div>
         </div>

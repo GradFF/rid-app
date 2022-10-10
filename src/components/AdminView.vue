@@ -1,20 +1,21 @@
 <script setup>
 import { storeToRefs } from 'pinia'
-import { onMounted, ref, watchEffect } from 'vue'
+import { onMounted, ref } from 'vue'
 import { useOrderStore } from '../stores/order'
 import Navbar from './shared/Navbar.vue'
 import Table from './shared/orders/Table.vue'
 import FilterModal from './shared/orders/FilterModal.vue'
-import FormModal from './shared/orders/FormModal.vue'
+import { settings } from '../services'
 
 const store = useOrderStore()
 const { filters, orders } = storeToRefs(store)
 
 const showFilter = ref(false)
-const showForm = ref(false)
+const setting = ref(null)
 
 onMounted(async () => {
-  store.fetch()
+  await store.fetch()
+  setting.value = await settings.find()
 })
 
 const handleSubmit = async () => {
@@ -54,7 +55,6 @@ const handleSubmit = async () => {
       </button>
     </div>
 
-    <Table :orders="orders" @show="showForm = true" />
-    <FormModal @close="showForm = false" :show-form="showForm" />
+    <Table :orders="orders" />
   </div>
 </template>

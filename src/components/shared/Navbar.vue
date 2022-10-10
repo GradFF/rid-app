@@ -1,8 +1,30 @@
-<script setup></script>
+<script setup>
+import { ref } from 'vue'
+import { useRouter } from 'vue-router'
+import { auth } from '../../services'
+
+const router = useRouter()
+
+const { loggedIn } = auth.useAuthState()
+
+const loading = ref(false)
+
+const logout = async () => {
+  loading.value = true
+  try {
+    await auth.logoutUser()
+    router.replace({ name: 'home' })
+  } catch (error) {
+    console.log(error)
+  } finally {
+    loading.value = false
+  }
+}
+</script>
 <template>
   <div class="navbar bg-base-100">
     <div class="navbar-start">
-      <div class="dropdown">
+      <div class="dropdown" v-if="loggedIn">
         <label tabindex="0" class="btn btn-ghost btn-circle">
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -24,7 +46,7 @@
           class="menu menu-compact dropdown-content mt-3 p-2 shadow bg-base-300 rounded-box w-52"
         >
           <li><a>Settings</a></li>
-          <li><a>Admin</a></li>
+          <li><RouterLink :to="{ name: 'admin' }">Admin</RouterLink></li>
         </ul>
       </div>
     </div>
@@ -37,7 +59,11 @@
     </div>
     <div class="navbar-end">
       <!-- login -->
-      <RouterLink :to="{ name: 'login' }" class="btn btn-ghost btn-circle">
+      <RouterLink
+        :to="{ name: 'login' }"
+        v-if="!loggedIn"
+        class="btn btn-ghost btn-circle"
+      >
         <svg
           xmlns="http://www.w3.org/2000/svg"
           fill="none"
@@ -53,8 +79,14 @@
           />
         </svg>
       </RouterLink>
-      <button class="btn btn-ghost btn-circle">
-        <div class="indicator">
+      <!-- Logout -->
+      <button
+        v-else
+        class="btn btn-ghost btn-circle"
+        @click="logout"
+        :class="loading && 'loading'"
+      >
+        <div class="indicator" v-if="!loading">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             fill="none"

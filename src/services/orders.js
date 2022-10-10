@@ -8,6 +8,8 @@ import {
   setDoc,
   where
 } from 'firebase/firestore'
+import { getDownloadURL, ref, uploadBytes } from 'firebase/storage'
+import { storage } from '../utils/firebase'
 import { db } from '../utils/firebase'
 const collectionName = 'users'
 
@@ -29,5 +31,12 @@ export default {
       query(collection(db, collectionName), where(field, opr, value))
     ).then(snapshot => {
       return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }))
-    })
+    }),
+  upload: async (file, name) => {
+    let newFile = ref(storage, `files/${name}`)
+
+    let upload = await uploadBytes(newFile, file)
+    let photoUrl = await getDownloadURL(upload.ref)
+    return photoUrl
+  }
 }
