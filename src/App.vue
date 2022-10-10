@@ -1,6 +1,6 @@
 <script setup></script>
 <template>
-  <div class="min-h-screen bg-zinc-900 text-zinc-100">
+  <div class="min-h-screen">
     <RouterView />
   </div>
 </template>
