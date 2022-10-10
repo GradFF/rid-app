@@ -8,16 +8,43 @@ const router = createRouter({
       path: '/',
       name: 'home',
       component: HomeView
+    },
+    {
+      path: '/requerimento',
+      name: 'create',
+      component: () => import('../components/FormView.vue')
+    },
+    {
+      path: '/success',
+      name: 'success',
+      component: () => import('../components/SuccessView.vue')
+    },
+    {
+      path: '/admin',
+      name: 'admin',
+      component: () => import('../components/AdminView.vue')
+    },
+    {
+      path: '/login',
+      name: 'login',
+      component: () => import('../components/LoginView.vue')
     }
-    // {
-    //   path: '/about',
-    //   name: 'about',
-    //   // route level code-splitting
-    //   // this generates a separate chunk (About.[hash].js) for this route
-    //   // which is lazy-loaded when the route is visited.
-    //   component: () => import('../views/AboutView.vue')
-    // }
   ]
 })
+
+// router.beforeEach(async (to, from, next) => {
+//   document.title = `${to.meta.title} | FireAuth`;
+
+//   const requiresAuth = to.matched.some((record) => record.meta.requiresAuth);
+//   const requiresUnauth = to.matched.some(
+//     (record) => record.meta.requiresUnauth
+//   );
+
+//   const isAutenticated = await getUserState();
+
+//   if (requiresAuth && !isAutenticated) next({ name: "login" });
+//   else if (requiresUnauth && isAutenticated) next({ name: "home" });
+//   else next();
+// });
 
 export default router

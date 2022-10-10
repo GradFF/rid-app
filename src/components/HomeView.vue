@@ -1,62 +1,41 @@
 <script setup>
-import { storeToRefs } from 'pinia'
-import { onMounted, ref, watchEffect } from 'vue'
-import { useOrderStore } from '../stores/order'
 import Navbar from './shared/Navbar.vue'
-import Table from './shared/orders/Table.vue'
-import FilterModal from './shared/orders/FilterModal.vue'
-import FormModal from './shared/orders/FormModal.vue'
-
-const store = useOrderStore()
-const { filters, orders, btnLoadMoreVisible } = storeToRefs(store)
-
-const showFilter = ref(false)
-const showForm = ref(false)
-
-onMounted(async () => {
-  store.fetch()
-})
-
-const handleSubmit = async () => {
-  await store.findByName()
-}
 </script>
 <template>
-  <div class="container mx-auto px-4 pb-12">
-    <Navbar @search="showFilter = true" />
-    <div class="container py-8">
-      <h1 class="text-3xl font-bold">Solicitações</h1>
-    </div>
+  <div class="min-h-screen bg-base-200">
+    <Navbar />
+    <div class="hero mt-12">
+      <div class="hero-content text-center">
+        <div class="max-w-md">
+          <h1 class="text-2xl font-bold mb-8">
+            Regularização de inscrição em disciplina 2022-2
+          </h1>
 
-    <FilterModal @close="showFilter = false" :is-open="showFilter" />
-    <!-- SEARCH -->
+          <RouterLink :to="{ name: 'create' }" class="btn btn-primary mb-4">
+            Solicitar Regularização
+          </RouterLink>
+          <div class="divider">OU</div>
 
-    <div class="flex items-center sm:justify-between mb-4">
-      <form @submit.prevent="handleSubmit">
-        <div class="form-control w-full">
-          <div class="flex items-center space-x-2">
-            <input
-              type="search"
-              placeholder="Pesquisar por nome"
-              class="input input-bordered input-sm"
-              v-model="filters.name"
-            />
-            <button type="submit" class="btn btn-primary btn-sm">
-              Pesquisar
-            </button>
-          </div>
+          <p>
+            Infome no campo abaixo o código de acesso que recebeu quando
+            preencheu o requerimento.
+          </p>
+          <form @submit.prevent="handleSubmit">
+            <div class="form-control mt-4">
+              <div class="flex items-center space-x-2">
+                <input
+                  type="search"
+                  placeholder="Informe o código"
+                  class="input input-bordered w-full"
+                />
+                <button type="submit" class="btn btn-primary btn-outline">
+                  Pesquisar
+                </button>
+              </div>
+            </div>
+          </form>
         </div>
-      </form>
-      <button
-        type="button"
-        class="btn btn-primary btn-sm"
-        @click="showFilter = true"
-      >
-        Filtrar
-      </button>
+      </div>
     </div>
-
-    <Table :orders="orders" @show="showForm = true" />
-    <FormModal @close="showForm = false" :show-form="showForm" />
   </div>
 </template>
