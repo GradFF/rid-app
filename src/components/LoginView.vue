@@ -62,6 +62,9 @@ const handleSubmit = async () => {
                 Entrar
               </button>
             </div>
+            <div class="text-center pt-4">
+              <RouterLink to="/" class="btn btn-link"> Voltar </RouterLink>
+            </div>
           </form>
         </div>
       </div>
