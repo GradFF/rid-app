@@ -38,12 +38,17 @@ const getColors = value => {
         <tbody>
           <!-- row 1 -->
           <tr v-for="order in orders" :key="order.id">
-            <td>
+            <th>
               <div>
-                <div class="font-bold">{{ order.name }}</div>
+                <RouterLink
+                  :to="{ name: 'manager', params: { id: order.id } }"
+                  class="font-bold"
+                >
+                  {{ order.name }}
+                </RouterLink>
                 <div class="text-sm opacity-50">{{ order.email }}</div>
               </div>
-            </td>
+            </th>
             <td>{{ order.register }}</td>
             <td>{{ order.course }}</td>
             <th>

@@ -39,14 +39,16 @@ watch(
     <FilterModal @close="showFilter = false" :is-open="showFilter" />
     <!-- SEARCH -->
 
-    <div class="flex items-center sm:justify-between mb-4">
+    <div
+      class="flex flex-col dm:flex-row sm:items-center sm:justify-between mb-4"
+    >
       <form @submit.prevent="handleSubmit">
         <div class="form-control w-full">
           <div class="flex items-center space-x-2">
             <input
               type="search"
               placeholder="Pesquisar por nome"
-              class="input input-bordered input-sm"
+              class="input input-bordered input-sm w-full"
               v-model="filters.name"
             />
             <button type="submit" class="btn btn-primary btn-sm">
@@ -57,7 +59,7 @@ watch(
       </form>
       <button
         type="button"
-        class="btn btn-primary btn-sm"
+        class="btn btn-primary btn-sm mt-4 sm:mt-0"
         @click="showFilter = true"
       >
         Filtrar

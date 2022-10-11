@@ -49,7 +49,9 @@ const handleSubmit = async () => {
     <Alert :show="error != null" type="error" class="mt-6 mb-2">
       {{ error }}
     </Alert>
-    <div class="flex items-start justify-between">
+    <div
+      class="flex flex-col-reverse sm:flex-row sm:items-start sm:justify-between"
+    >
       <div class="mb-6">
         <h1 class="text-3xl font-bold">{{ order.name }}</h1>
         <p>DRE: {{ order.register }}</p>
