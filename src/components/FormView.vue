@@ -64,7 +64,7 @@ const handleSubmit = async () => {
   <div class="max-w-screen-md mx-auto px-4 py-12">
     <!-- Header -->
     <div class="flex items-center justify-between">
-      <h1 class="text-3xl font-bold my-8">Solicitações</h1>
+      <h1 class="text-2xl font-bold my-8">Requerimento de regularização</h1>
       <RouterLink :to="{ name: 'home' }" class="btn btn-ghost">
         Voltar
       </RouterLink>
@@ -180,6 +180,8 @@ const handleSubmit = async () => {
               v-model="order.justification"
             ></textarea>
           </div>
+
+          <!-- UPLOAD -->
           <div class="form-control sm:col-span-2 mb-4">
             <a
               v-if="order.url"
@@ -207,6 +209,8 @@ const handleSubmit = async () => {
               </label>
             </template>
           </div>
+
+          <!--  -->
           <div class="form-control sm:col-span-2">
             <label class="label cursor-pointer">
               <span class="label-text"

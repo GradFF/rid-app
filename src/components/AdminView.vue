@@ -40,7 +40,7 @@ watch(
     <!-- SEARCH -->
 
     <div
-      class="flex flex-col dm:flex-row sm:items-center sm:justify-between mb-4"
+      class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4"
     >
       <form @submit.prevent="handleSubmit">
         <div class="form-control w-full">
