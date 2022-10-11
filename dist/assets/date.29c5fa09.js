@@ -1,0 +1,1 @@
+const $=()=>{let t=new Date;return`${t.getFullYear()}-${t.getMonth()+1}-${t.getDate()}`},s=t=>{if(t){let[r,o,a,n]=t.split("-");return`${e(a)}/${e(o)}/${r}`}return t},e=t=>t<10?`0${t}`:`${t}`;export{s as f,$ as g};
