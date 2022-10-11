@@ -44,15 +44,15 @@ const handlePrint = () => {
       </div>
     </div>
     <div id="home" class="hidden" style="text-align: center">
-      <div style="font-size: 2rem; margin-bottom: 2rem">
+      <div style="font-size: 1rem; margin-bottom: 2rem">
         Faculdade de Farmácia - UFRJ
       </div>
-      <h2 style="font-size: 3rem; font-weight: bold; margin-bottom: 2rem">
+      <h2 style="font-size: 2rem; font-weight: bold; margin-bottom: 2rem">
         Solicitação enviada com sucesso!
       </h2>
 
       <h4>
-        Comprovante de solicitação de Regularização de incrição em disciplina
+        Comprovante de solicitação de Regularização de inscrição em disciplina
       </h4>
       <p>Aluno(a): {{ order.name }}</p>
       <p>DRE: {{ order.register }}</p>
@@ -60,7 +60,7 @@ const handlePrint = () => {
       <p>Período: {{ order.semester || '2022-2' }}</p>
 
       <p style="margin-bottom: 1rem">Código de acesso</p>
-      <h1 style="font-size: 5rem; font-weight: bold; margin-bottom: 2rem">
+      <h1 style="font-size: 3rem; font-weight: bold; margin-bottom: 2rem">
         {{ order.code }}
       </h1>
 

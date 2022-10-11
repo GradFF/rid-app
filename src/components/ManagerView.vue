@@ -65,14 +65,24 @@ const handleSubmit = async () => {
       <div class="divider"></div>
       <b>Justificativa</b>
       <p>{{ order.justification }}</p>
-      <a
-        v-if="order.url"
-        :href="order.url"
-        class="btn btn-link"
-        target="_blank"
-        rel="noopener noreferrer"
-        >Visualizar CRID</a
-      >
+      <div class="flex">
+        <a
+          v-if="order.crid"
+          :href="order.crid"
+          class="btn btn-link"
+          target="_blank"
+          rel="noopener noreferrer"
+          >Visualizar CRID</a
+        >
+        <a
+          v-if="order.doc"
+          :href="order.doc"
+          class="btn btn-link"
+          target="_blank"
+          rel="noopener noreferrer"
+          >Outros</a
+        >
+      </div>
     </div>
     <div class="divider"></div>
     <form @submit.prevent="handleSubmit">

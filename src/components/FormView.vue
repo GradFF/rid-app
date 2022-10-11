@@ -13,7 +13,8 @@ const route = useRoute()
 const order = ref({})
 const setting = ref(null)
 const loading = ref(false)
-const file = ref(null)
+const crid = ref(null)
+const doc = ref(null)
 
 const orderId = computed(() => route.params.id || null)
 
@@ -39,16 +40,30 @@ onMounted(async () => {
       })
 })
 
-const handleFileUpload = async e => {
-  file.value = e.target.files[0]
+const handleCridUpload = async e => {
+  crid.value = e.target.files[0]
+}
+
+const handleDocUpload = async e => {
+  doc.value = e.target.files[0]
 }
 
 const handleSubmit = async () => {
   loading.value = true
   try {
-    const url = await orders.upload(file.value, order.value.code)
-    order.value.url = url
+    if (crid.value !== null) {
+      const cridURL = await orders.upload(
+        crid.value,
+        `CRID-${order.value.code}`
+      )
+      order.value.crid = cridURL
+    }
+    if (doc.value !== null) {
+      const docURL = await orders.upload(doc.value, `DOC-${order.value.code}`)
+      order.value.doc = docURL
+    }
     order.value.name = order.value.name.toUpperCase()
+
     const result = orderId.value
       ? await orders.update(order.value, orderId.value)
       : await orders.create(order.value)
@@ -182,33 +197,59 @@ const handleSubmit = async () => {
           </div>
 
           <!-- UPLOAD -->
-          <div class="form-control sm:col-span-2 mb-4">
-            <a
-              v-if="order.url"
-              :href="order.url"
-              class="btn btn-link"
-              target="_blank"
-              rel="noopener noreferrer"
-              >Visualizar CRID</a
-            >
-            <template v-if="order.status && order.status === 'Aguardando'">
+          <template v-if="order.status && order.status === 'Aguardando'">
+            <div class="form-control sm:col-span-2 mb-4">
               <label class="label">
                 <span class="label-text">
                   Anexe sua CRID mais recente (contendo as irregularidades)
                 </span>
               </label>
               <label class="block">
-                <span class="sr-only">Choose profile photo</span>
+                <span class="sr-only">Choose File</span>
                 <input
                   accept="application/pdf"
-                  @change="handleFileUpload"
+                  @change="handleCridUpload"
                   type="file"
                   class="block w-full text-sm file:mr-4 file:btn file:btn-primary file:btn-outline"
-                  :required="file != null || !order.url"
+                  :required="crid != null || !order.crid"
                 />
               </label>
-            </template>
-          </div>
+              <a
+                v-if="order.crid"
+                :href="order.crid"
+                class="btn btn-link"
+                target="_blank"
+                rel="noopener noreferrer"
+                >Visualizar CRID</a
+              >
+            </div>
+          </template>
+          <template v-if="order.status && order.status === 'Aguardando'">
+            <div class="form-control sm:col-span-2 mb-4">
+              <label class="label">
+                <span class="label-text">
+                  Outro documento (Se necessário)
+                </span>
+              </label>
+              <label class="block">
+                <span class="sr-only">Choose file</span>
+                <input
+                  accept="application/pdf"
+                  @change="handleDocUpload"
+                  type="file"
+                  class="block w-full text-sm file:mr-4 file:btn file:btn-primary file:btn-outline"
+                />
+              </label>
+              <a
+                v-if="order.doc"
+                :href="order.doc"
+                class="btn btn-link"
+                target="_blank"
+                rel="noopener noreferrer"
+                >Visualizar Documento</a
+              >
+            </div>
+          </template>
 
           <!--  -->
           <div class="form-control sm:col-span-2">
@@ -228,7 +269,7 @@ const handleSubmit = async () => {
             class="btn btn-primary px-6 disabled:cursor-not-allowed"
             :class="loading && 'loading'"
             v-if="order.status && order.status === 'Aguardando'"
-            :disabled="!order.term"
+            :disabled="!order.term || loading"
           >
             Salvar
           </button>

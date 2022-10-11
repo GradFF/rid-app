@@ -36,8 +36,8 @@ export default {
       return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }))
     }),
 
-  upload: async (file, name) => {
-    let newFile = ref(storage, `files/${name}`)
+  upload: async (file, name = null) => {
+    let newFile = ref(storage, `files/${name || file.name}`)
 
     let upload = await uploadBytes(newFile, file)
     let photoUrl = await getDownloadURL(upload.ref)
