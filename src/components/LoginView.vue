@@ -7,8 +7,8 @@ const router = useRouter()
 
 const loading = ref(false)
 
-const email = ref('secretariaffufrj@gmail.com')
-const password = ref('@farmacia1937')
+const email = ref('')
+const password = ref('')
 
 const handleSubmit = async () => {
   loading.value = true

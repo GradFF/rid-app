@@ -22,7 +22,7 @@ const logout = async () => {
 }
 </script>
 <template>
-  <div class="navbar bg-base-100">
+  <div class="navbar">
     <div class="navbar-start">
       <div class="dropdown" v-if="loggedIn">
         <label tabindex="0" class="btn btn-ghost btn-circle">

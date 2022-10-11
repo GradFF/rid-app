@@ -29,7 +29,7 @@ export const useOrderStore = defineStore('order', () => {
 
     if (filters.course != 'Todos') {
       q = query(
-        collection(db, 'users'),
+        collection(db, 'orders'),
         where('course', '==', filters.course),
         where('status', 'in', filters.status),
         orderBy('name'),
@@ -37,7 +37,7 @@ export const useOrderStore = defineStore('order', () => {
       )
     } else {
       q = query(
-        collection(db, 'users'),
+        collection(db, 'orders'),
         where('status', 'in', filters.status),
         orderBy('name'),
         limit(lmt.value)
@@ -55,7 +55,7 @@ export const useOrderStore = defineStore('order', () => {
 
     if (filters.course != 'Todos') {
       q = query(
-        collection(db, 'users'),
+        collection(db, 'orders'),
         where('course', '==', filters.course),
         where('status', 'in', filters.status),
         orderBy('name'),
@@ -64,7 +64,7 @@ export const useOrderStore = defineStore('order', () => {
       )
     } else {
       q = query(
-        collection(db, 'users'),
+        collection(db, 'orders'),
         where('status', 'in', filters.status),
         orderBy('name'),
         startAfter(lastDocument.value),
@@ -87,7 +87,7 @@ export const useOrderStore = defineStore('order', () => {
 
     if (filters.name) {
       q = query(
-        collection(db, 'users'),
+        collection(db, 'orders'),
         where('name', '>=', filters.name && filters.name.toUpperCase()),
         where(
           'name',

@@ -27,3 +27,15 @@ npm run dev
 ```sh
 npm run build
 ```
+
+### Deploy git page
+
+base url vite config
+
+npm run build
+
+git add dist -f
+
+git commit -m ""
+
+git subtree push --prefix dist origin gh-pages

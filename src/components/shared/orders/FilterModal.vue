@@ -1,16 +1,33 @@
 <script setup>
 import { storeToRefs } from 'pinia'
+import { ref } from 'vue'
 import { useOrderStore } from '../../../stores/order'
+import Alert from '../Alert.vue'
 
 defineProps({
   isOpen: Boolean
 })
 
 const emit = defineEmits(['close'])
+const error = ref(null)
+const loading = ref(false)
 
 const handleFilter = async () => {
-  await store.fetch()
-  close()
+  error.value = null
+  if (filters.value.status.length == 0) {
+    error.value = 'Selecione pelo menos um status.'
+    return
+  }
+  loading.value = true
+  try {
+    await store.fetch()
+    close()
+  } catch (error) {
+    console.log(error)
+    error.value = 'Ocorreu um problema. Tente novamente.'
+  } finally {
+    loading.value = false
+  }
 }
 
 const close = () => {
@@ -23,21 +40,22 @@ const { filters } = storeToRefs(store)
 <template>
   <div>
     <!-- Put this part before </body> tag -->
-    <input
-      type="checkbox"
-
-      class="modal-toggle"
-      v-model="isOpen"
-    />
+    <input type="checkbox" class="modal-toggle" v-model="isOpen" />
 
     <!-- FILTERS -->
     <div class="modal">
       <div class="modal-box relative">
-        <button @click="close"
-          
+        <button
+          @click="close"
           class="btn btn-sm btn-circle absolute right-2 top-2"
-          >✕</button
         >
+          ✕
+        </button>
+
+        <Alert :show="error != null" type="error" class="mt-6 mb-2">
+          {{ error }}
+        </Alert>
+
         <h3 class="text-lg font-bold mb-6">Filtrar Solicitações</h3>
 
         <fieldset class="p-4 mb-4 border border-base-200 rounded-md">
@@ -78,7 +96,13 @@ const { filters } = storeToRefs(store)
           </div>
         </fieldset>
         <div class="form-control mt-6">
-          <button @click="handleFilter" class="btn btn-primary">Filtrar</button>
+          <button
+            @click="handleFilter"
+            class="btn btn-primary"
+            :class="loading && 'loading'"
+          >
+            Filtrar
+          </button>
         </div>
       </div>
     </div>

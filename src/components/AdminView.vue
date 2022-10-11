@@ -1,6 +1,6 @@
 <script setup>
 import { storeToRefs } from 'pinia'
-import { onMounted, ref } from 'vue'
+import { onMounted, ref, watch, watchEffect } from 'vue'
 import { useOrderStore } from '../stores/order'
 import Navbar from './shared/Navbar.vue'
 import Table from './shared/orders/Table.vue'
@@ -21,6 +21,15 @@ onMounted(async () => {
 const handleSubmit = async () => {
   await store.findByName()
 }
+
+watch(
+  () => filters.value.name,
+  newValue => {
+    if (newValue === '') {
+      store.fetch()
+    }
+  }
+)
 </script>
 <template>
   <div class="container mx-auto px-4 pb-12">

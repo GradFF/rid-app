@@ -1,8 +1,10 @@
 <script setup>
-import { useRouter } from 'vue-router'
-import Navbar from './shared/Navbar.vue'
-import { orders } from '../services'
 import { ref } from 'vue'
+import { useRouter } from 'vue-router'
+import { orders } from '../services'
+
+import Navbar from './shared/Navbar.vue'
+
 const router = useRouter()
 
 const search = ref('')

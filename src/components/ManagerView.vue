@@ -4,19 +4,29 @@ import { orders } from '../services'
 import { settings } from '../services'
 
 import { useRoute, useRouter } from 'vue-router'
+import Alert from './shared/Alert.vue'
 
 const router = useRouter()
 const route = useRoute()
 
 const order = ref({})
 const setting = ref(null)
+const error = ref(null)
 const loading = ref(false)
+const loadingForm = ref(false)
 
 onMounted(async () => {
-  setting.value = await settings.find()
-  route.params.id
-    ? (order.value = await orders.find(route.params.id))
-    : console.log('Not found')
+  loadingForm.value = true
+  try {
+    setting.value = await settings.find()
+    route.params.id
+      ? (order.value = await orders.find(route.params.id))
+      : console.log('Not found')
+  } catch (error) {
+    console.log(error)
+  } finally {
+    loadingForm.value = false
+  }
 })
 
 const handleSubmit = async () => {
@@ -32,7 +42,13 @@ const handleSubmit = async () => {
 }
 </script>
 <template>
-  <div class="max-w-screen-sm mx-auto px-4 py-12">
+  <div v-if="loadingForm" class="h-screen flex items-center justify-center">
+    <h1 class="text-2xl">Carregando ...</h1>
+  </div>
+  <div class="max-w-screen-sm mx-auto px-4 py-12" v-if="!loadingForm">
+    <Alert :show="error != null" type="error" class="mt-6 mb-2">
+      {{ error }}
+    </Alert>
     <div class="flex items-start justify-between">
       <div class="mb-6">
         <h1 class="text-3xl font-bold">{{ order.name }}</h1>
@@ -53,37 +69,24 @@ const handleSubmit = async () => {
     </div>
 
     <form @submit.prevent="handleSubmit">
-      <fieldset
-        class="p-2 mb-4 border border-base-300 rounded-md"
-        v-if="setting"
-      >
-        <legend class="text-content text-sm font-semibold px-2 uppercase">
-          Coordenador Responsável
-        </legend>
-        <div
-          class="form-control"
-          v-for="item in setting.teachers"
-          :key="item.name"
+      <!-- RESPONSIBLE -->
+      <div class="form-control mb-4" v-if="setting">
+        <label class="label">
+          <span class="label-text">Coordenador</span>
+        </label>
+        <select
+          class="select select-bordered"
+          v-model="order.responsible"
+          required
         >
-          <label class="label cursor-pointer" v-if="item.show">
-            <span
-              class="label-text"
-              :class="
-                item.name == order.responsible
-                  ? 'text-primary font-medium text-lg'
-                  : ''
-              "
-              >{{ item.name }}</span
-            >
-            <input
-              type="radio"
-              class="radio"
-              v-model="order.responsible"
-              :value="item.name"
-            />
-          </label>
-        </div>
-      </fieldset>
+          <option disabled selected>Selecione o curso</option>
+          <option v-for="item in setting.teachers" :key="item.name">
+            {{ item.name }}
+          </option>
+        </select>
+      </div>
+
+      <!-- STATUS -->
       <fieldset
         class="p-2 mb-4 border border-base-300 rounded-md"
         v-if="setting"
@@ -133,7 +136,6 @@ const handleSubmit = async () => {
       <div class="form-control pt-4">
         <button
           type="submit"
-          @click="handleSubmit"
           class="btn btn-primary"
           :class="loading && 'loading'"
         >
