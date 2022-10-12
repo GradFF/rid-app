@@ -3,6 +3,7 @@ import { onMounted, ref, computed } from 'vue'
 import { useRoute } from 'vue-router'
 import { orders } from '../services'
 import { formatDateTime } from '../utils/date'
+import { jsPDF } from 'jspdf'
 
 const route = useRoute()
 
@@ -14,11 +15,43 @@ onMounted(async () => {
 })
 
 const handlePrint = () => {
-  var doc = document.getElementById('home').innerHTML
-  var win = window.open()
-  win.document.write(doc)
-  win.print()
-  win.close() //Fecha após a impressã
+  const doc = new jsPDF()
+
+  doc.setFont(undefined, 'bold')
+  doc.text(20, 20, 'Faculdade de Farmácia - UFRJ')
+  doc.setFontSize(14)
+  doc.text(
+    20,
+    40,
+    'Comprovante de solicitação de Regularização de inscrição em disciplina'
+  )
+
+  doc.setFont(undefined, 'normal')
+  doc.setFontSize(10)
+  doc.text(20, 60, `Aluno(a): ${order.value.name}`)
+  doc.text(20, 65, `DRE: ${order.value.register}`)
+  doc.text(
+    20,
+    70,
+    `Data da Solicitação: ${formatDateTime(order.value.created_at)}`
+  )
+  doc.text(20, 75, `Semestre: ${order.value.semester || '2022-2'}`)
+
+  doc.setFont(undefined, 'bold')
+  doc.setFontSize(12)
+  doc.text(20, 90, `Código de acesso`)
+
+  doc.setFontSize(48)
+  doc.text(20, 110, order.value.code)
+
+  doc.setFontSize(12)
+  doc.text(
+    20,
+    130,
+    'Use o código acima para acompanhar a sua solicitação e editar se necessário.'
+  )
+
+  doc.save(`Comprovante ${order.value.name}.pdf`)
 }
 </script>
 <template>
@@ -43,43 +76,5 @@ const handlePrint = () => {
         </div>
       </div>
     </div>
-    <div id="home" class="hidden" style="text-align: center">
-      <div style="font-size: 2rem; margin-bottom: 2rem">
-        Faculdade de Farmácia - UFRJ
-      </div>
-      <h2 style="font-size: 3rem; font-weight: bold; margin-bottom: 2rem">
-        Solicitação enviada com sucesso!
-      </h2>
-
-      <h4>
-        Comprovante de solicitação de Regularização de incrição em disciplina
-      </h4>
-      <p>Aluno(a): {{ order.name }}</p>
-      <p>DRE: {{ order.register }}</p>
-      <p>Data da Solicitação: {{ formatDateTime(order.created_at) }}</p>
-      <p>Período: {{ order.semester || '2022-2' }}</p>
-
-      <p style="margin-bottom: 1rem">Código de acesso</p>
-      <h1 style="font-size: 5rem; font-weight: bold; margin-bottom: 2rem">
-        {{ order.code }}
-      </h1>
-
-      <p style="margin-bottom: 2rem">
-        Use o código acima para acompanhar a sua solicitação e editar se
-        necessário.
-      </p>
-
-      <p style="color: red">
-        Guarde seu código de acesso. Não será possível recuperá-lo.
-      </p>
-    </div>
   </div>
 </template>
-<style>
-.home {
-  text-align: center;
-  font-size: 2rem;
-  font-weight: bold;
-  margin-bottom: 2rem;
-}
-</style>

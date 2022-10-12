@@ -46,28 +46,45 @@ const handleSubmit = async () => {
     <h1 class="text-2xl">Carregando ...</h1>
   </div>
   <div class="max-w-screen-sm mx-auto px-4 py-12" v-if="!loadingForm">
+    <div class="flex justify-end">
+      <RouterLink :to="{ name: 'admin' }" class="btn btn-ghost">
+        Voltar
+      </RouterLink>
+    </div>
     <Alert :show="error != null" type="error" class="mt-6 mb-2">
       {{ error }}
     </Alert>
-    <div class="flex items-start justify-between">
-      <div class="mb-6">
-        <h1 class="text-3xl font-bold">{{ order.name }}</h1>
-        <p>DRE: {{ order.register }}</p>
-        <p>Curso: {{ order.course }}</p>
+
+    <div class="mb-6">
+      <h1 class="text-3xl font-bold">{{ order.name }}</h1>
+      <p>DRE: {{ order.register }}</p>
+      <p>Curso: {{ order.course }}</p>
+      <div class="divider"></div>
+      <b>Irregularidade(s)</b>
+      <p v-for="item in order.problems" :key="item">{{ item }}</p>
+      <div class="divider"></div>
+      <b>Justificativa</b>
+      <p>{{ order.justification }}</p>
+      <div class="flex">
         <a
-          v-if="order.url"
-          :href="order.url"
+          v-if="order.crid"
+          :href="order.crid"
           class="btn btn-link"
           target="_blank"
           rel="noopener noreferrer"
           >Visualizar CRID</a
         >
+        <a
+          v-if="order.doc"
+          :href="order.doc"
+          class="btn btn-link"
+          target="_blank"
+          rel="noopener noreferrer"
+          >Outros</a
+        >
       </div>
-      <RouterLink :to="{ name: 'admin' }" class="btn btn-ghost">
-        Voltar
-      </RouterLink>
     </div>
-
+    <div class="divider"></div>
     <form @submit.prevent="handleSubmit">
       <!-- RESPONSIBLE -->
       <div class="form-control mb-4" v-if="setting">

@@ -13,7 +13,8 @@ const route = useRoute()
 const order = ref({})
 const setting = ref(null)
 const loading = ref(false)
-const file = ref(null)
+const crid = ref(null)
+const doc = ref(null)
 
 const orderId = computed(() => route.params.id || null)
 
@@ -39,16 +40,30 @@ onMounted(async () => {
       })
 })
 
-const handleFileUpload = async e => {
-  file.value = e.target.files[0]
+const handleCridUpload = async e => {
+  crid.value = e.target.files[0]
+}
+
+const handleDocUpload = async e => {
+  doc.value = e.target.files[0]
 }
 
 const handleSubmit = async () => {
   loading.value = true
   try {
-    const url = await orders.upload(file.value, order.value.code)
-    order.value.url = url
+    if (crid.value !== null) {
+      const cridURL = await orders.upload(
+        crid.value,
+        `CRID-${order.value.code}`
+      )
+      order.value.crid = cridURL
+    }
+    if (doc.value !== null) {
+      const docURL = await orders.upload(doc.value, `DOC-${order.value.code}`)
+      order.value.doc = docURL
+    }
     order.value.name = order.value.name.toUpperCase()
+
     const result = orderId.value
       ? await orders.update(order.value, orderId.value)
       : await orders.create(order.value)
@@ -64,7 +79,7 @@ const handleSubmit = async () => {
   <div class="max-w-screen-md mx-auto px-4 py-12">
     <!-- Header -->
     <div class="flex items-center justify-between">
-      <h1 class="text-3xl font-bold my-8">Solicitações</h1>
+      <h1 class="text-2xl font-bold my-8">Requerimento de regularização</h1>
       <RouterLink :to="{ name: 'home' }" class="btn btn-ghost">
         Voltar
       </RouterLink>
@@ -85,148 +100,176 @@ const handleSubmit = async () => {
     <Alert :show="order.status === 'Aguardando' && orderId != null" type="info">
       <p>Solicitação aguardando parecer da coordenação</p>
     </Alert>
-
-    <!-- Form -->
-    <form @submit.prevent="handleSubmit">
-      <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
-        <div class="form-control">
-          <label class="label">
-            <span class="label-text">Curso</span>
-          </label>
-          <select
-            class="select select-bordered"
-            v-model="order.course"
-            required
-          >
-            <option disabled selected>Selecione o curso</option>
-            <option>Integral</option>
-            <option>Noturno</option>
-          </select>
-        </div>
-        <div class="form-control">
-          <label class="label">
-            <span class="label-text">DRE</span>
-          </label>
-          <input
-            type="text"
-            placeholder="DRE"
-            class="input input-bordered"
-            v-model="order.register"
-            required
-          />
-        </div>
-        <div class="form-control">
-          <label class="label">
-            <span class="label-text">Nome Completo</span>
-          </label>
-          <input
-            type="text"
-            placeholder="Nome completo"
-            class="input input-bordered"
-            v-model="order.name"
-            required
-          />
-        </div>
-        <div class="form-control">
-          <label class="label">
-            <span class="label-text">Email</span>
-          </label>
-          <input
-            type="text"
-            placeholder="email"
-            class="input input-bordered"
-            v-model="order.email"
-            required
-          />
-        </div>
-
-        <fieldset
-          v-if="setting"
-          class="py-4 px-2 mb-4 border border-base-300 rounded-md col-span-2"
-        >
-          <legend class="text-content text-sm font-semibold px-2">
-            Qual(is) irregularidade(s) da CRID deseja regularizar?
-          </legend>
-          <div
-            class="form-control mb-4"
-            v-for="item in setting.problems"
-            :key="item.title"
-          >
-            <label class="label cursor-pointer">
-              <div class="label-text font-medium">
-                <span>{{ item.title }}</span>
-                <small class="px-4 block">{{ item.description }}</small>
-              </div>
-              <input
-                type="checkbox"
-                class="checkbox"
-                :value="item.title"
-                v-model="order.problems"
-              />
-            </label>
-          </div>
-        </fieldset>
-        <div class="form-control sm:col-span-2">
-          <label class="label cursor-pointer">
-            <span class="label-text"
-              >Atesto que li, entendi as instruções descritas acima e estou
-              ciente dos prazos para os procedimentos relativos a inscrição em
-              disciplinas e sua eventual regularização:
-            </span>
-            <input type="checkbox" class="checkbox" v-model="order.term" />
-          </label>
-        </div>
-
-        <div class="form-control sm:col-span-2">
-          <label class="label">
-            <span class="label-text"
-              >Justificativa (Cite especificamente cada disciplina com
-              irregularidade e a respectiva justificativa para a solicitação):
-            </span>
-          </label>
-          <textarea
-            rows="5"
-            class="textarea textarea-bordered w-full"
-            placeholder="Jusquifique o parecer"
-            v-model="order.justification"
-          ></textarea>
-        </div>
-
-        <div class="form-control sm:col-span-2">
-          <a
-            v-if="order.url"
-            :href="order.url"
-            class="btn btn-link"
-            target="_blank"
-            rel="noopener noreferrer"
-            >Visualizar CRID</a
-          >
-          <template v-if="order.status && order.status === 'Aguardando'">
+    <div>
+      <form @submit.prevent="handleSubmit">
+        <div class="grid grid-cols-1 gap-6 mt-4 sm:grid-cols-2">
+          <div class="form-control">
             <label class="label">
-              <span class="label-text">
-                Anexe sua CRID mais recente (contendo as irregularidades)
+              <span class="label-text">Curso</span>
+            </label>
+            <select
+              class="select select-bordered"
+              v-model="order.course"
+              required
+            >
+              <option disabled selected>Selecione o curso</option>
+              <option>Integral</option>
+              <option>Noturno</option>
+            </select>
+          </div>
+          <div class="form-control">
+            <label class="label">
+              <span class="label-text">DRE</span>
+            </label>
+            <input
+              type="text"
+              placeholder="DRE"
+              class="input input-bordered"
+              v-model="order.register"
+              required
+            />
+          </div>
+          <div class="form-control">
+            <label class="label">
+              <span class="label-text">Nome Completo</span>
+            </label>
+            <input
+              type="text"
+              placeholder="Nome completo"
+              class="input input-bordered"
+              v-model="order.name"
+              required
+            />
+          </div>
+          <div class="form-control">
+            <label class="label">
+              <span class="label-text">Email</span>
+            </label>
+            <input
+              type="text"
+              placeholder="email"
+              class="input input-bordered"
+              v-model="order.email"
+              required
+            />
+          </div>
+          <div class="sm:col-span-2">
+            <fieldset
+              v-if="setting"
+              class="py-4 px-2 mb-4 border border-base-300 rounded-md col-span-2"
+            >
+              <legend class="text-content text-sm font-semibold px-2">
+                Qual(is) irregularidade(s) da CRID deseja regularizar?
+              </legend>
+              <div
+                class="form-control mb-4"
+                v-for="item in setting.problems"
+                :key="item.title"
+              >
+                <label class="label cursor-pointer">
+                  <div class="label-text font-medium">
+                    <span>{{ item.title }}</span>
+                    <small class="px-4 block">{{ item.description }}</small>
+                  </div>
+                  <input
+                    type="checkbox"
+                    class="checkbox"
+                    :value="item.title"
+                    v-model="order.problems"
+                  />
+                </label>
+              </div>
+            </fieldset>
+          </div>
+          <div class="form-control sm:col-span-2 mb-4">
+            <label class="label">
+              <span class="label-text"
+                >Justificativa (Cite especificamente cada disciplina com
+                irregularidade e a respectiva justificativa para a solicitação):
               </span>
             </label>
-            <label class="block">
-              <span class="sr-only">Choose profile photo</span>
-              <input
-                accept="application/pdf"
-                @change="handleFileUpload"
-                type="file"
-                class="block w-full text-sm file:mr-4 file:btn file:btn-primary file:btn-outline"
-                :required="file != null || !order.url"
-              />
-            </label>
-          </template>
-        </div>
+            <textarea
+              rows="5"
+              class="textarea textarea-bordered w-full"
+              placeholder="Jusquifique o parecer"
+              v-model="order.justification"
+            ></textarea>
+          </div>
 
-        <div class="py-4 sm:col-span-2">
+          <!-- UPLOAD -->
+          <template v-if="order.status && order.status === 'Aguardando'">
+            <div class="form-control sm:col-span-2 mb-4">
+              <label class="label">
+                <span class="label-text">
+                  Anexe sua CRID mais recente (contendo as irregularidades)
+                </span>
+              </label>
+              <label class="block">
+                <span class="sr-only">Choose File</span>
+                <input
+                  accept="application/pdf"
+                  @change="handleCridUpload"
+                  type="file"
+                  class="block w-full text-sm file:mr-4 file:btn file:btn-primary file:btn-outline"
+                  :required="crid != null || !order.crid"
+                />
+              </label>
+              <a
+                v-if="order.crid"
+                :href="order.crid"
+                class="btn btn-link"
+                target="_blank"
+                rel="noopener noreferrer"
+                >Visualizar CRID</a
+              >
+            </div>
+          </template>
+          <template v-if="order.status && order.status === 'Aguardando'">
+            <div class="form-control sm:col-span-2 mb-4">
+              <label class="label">
+                <span class="label-text">
+                  Outro documento (Se necessário)
+                </span>
+              </label>
+              <label class="block">
+                <span class="sr-only">Choose file</span>
+                <input
+                  accept="application/pdf"
+                  @change="handleDocUpload"
+                  type="file"
+                  class="block w-full text-sm file:mr-4 file:btn file:btn-primary file:btn-outline"
+                />
+              </label>
+              <a
+                v-if="order.doc"
+                :href="order.doc"
+                class="btn btn-link"
+                target="_blank"
+                rel="noopener noreferrer"
+                >Visualizar Documento</a
+              >
+            </div>
+          </template>
+
+          <!--  -->
+          <div class="form-control sm:col-span-2">
+            <label class="label cursor-pointer">
+              <span class="label-text"
+                >Atesto que li, entendi as instruções descritas acima e estou
+                ciente dos prazos para os procedimentos relativos a inscrição em
+                disciplinas e sua eventual regularização:
+              </span>
+              <input type="checkbox" class="checkbox" v-model="order.term" />
+            </label>
+          </div>
+        </div>
+        <div class="py-4">
           <button
             type="submit"
             class="btn btn-primary px-6 disabled:cursor-not-allowed"
             :class="loading && 'loading'"
             v-if="order.status && order.status === 'Aguardando'"
-            :disabled="!order.term"
+            :disabled="!order.term || loading"
           >
             Salvar
           </button>
@@ -242,7 +285,7 @@ const handleSubmit = async () => {
             </p>
           </Alert>
         </div>
-      </div>
-    </form>
+      </form>
+    </div>
   </div>
 </template>

@@ -9,6 +9,7 @@
   "dependencies": {
     "daisyui": "^2.31.0",
     "firebase": "^9.11.0",
+    "jspdf": "^2.5.1",
     "nanoid": "^4.0.0",
     "pinia": "^2.0.21",
     "vue": "^3.2.38",
