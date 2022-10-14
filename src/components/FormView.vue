@@ -42,10 +42,20 @@ onMounted(async () => {
 })
 
 const handleCridUpload = async e => {
+  if (e.target.files[0].size > 1024000) {
+    alert('O arquivo deve ter no máximo 1MG.')
+    e.target.value = ''
+    return
+  }
   crid.value = e.target.files[0]
 }
 
 const handleDocUpload = async e => {
+  if (e.target.files[0].size > 1024000) {
+    alert('O arquivo deve ter no máximo 1MG.')
+    e.target.value = ''
+    return
+  }
   doc.value = e.target.files[0]
 }
 
