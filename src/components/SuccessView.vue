@@ -36,20 +36,24 @@ const handlePrint = () => {
     `Data da Solicitação: ${formatDateTime(order.value.created_at)}`
   )
   doc.text(20, 75, `Semestre: ${order.value.semester || '2022-2'}`)
+  doc.text(20, 80, `Irregularidade(s): ${order.value.problems}`)
+  doc.text(20, 85, `Justificativa: ${order.value.justification}`)
 
   doc.setFont(undefined, 'bold')
   doc.setFontSize(12)
-  doc.text(20, 90, `Código de acesso`)
+  doc.text(20, 95, `Código de acesso`)
 
   doc.setFontSize(48)
   doc.text(20, 110, order.value.code)
 
   doc.setFontSize(12)
+  doc.setFont(undefined, 'normal')
   doc.text(
     20,
     130,
     'Use o código acima para acompanhar a sua solicitação e editar se necessário.'
   )
+  doc.text(20, 140, 'Link para consulta: https://gradff-ufrj.web.app/')
 
   doc.save(`Comprovante ${order.value.name}.pdf`)
 }

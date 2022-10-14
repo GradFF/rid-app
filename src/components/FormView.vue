@@ -21,10 +21,11 @@ const orderId = computed(() => route.params.id || null)
 
 onMounted(async () => {
   setting.value = await settings.find()
+
   orderId.value
     ? (order.value = await orders.find(orderId.value))
     : (order.value = {
-        semester: '2022-2',
+        semester: setting.value.semesters[0].title || '2022-2',
         course: '',
         register: '',
         name: '',
@@ -62,7 +63,7 @@ const handleDocUpload = async e => {
 const handleSubmit = async () => {
   errors.value = []
   if (order.value.problems.length === 0) {
-    errors.value.push('Selecione pelo menos uma irregularizado.')
+    errors.value.push('Selecione pelo menos uma irregularidade.')
     return
   }
 
