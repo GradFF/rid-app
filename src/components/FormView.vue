@@ -15,6 +15,7 @@ const setting = ref(null)
 const loading = ref(false)
 const crid = ref(null)
 const doc = ref(null)
+const errors = ref([])
 
 const orderId = computed(() => route.params.id || null)
 
@@ -49,6 +50,12 @@ const handleDocUpload = async e => {
 }
 
 const handleSubmit = async () => {
+  errors.value = []
+  if (order.value.problems.length === 0) {
+    errors.value.push('Selecione pelo menos uma irregularizado.')
+    return
+  }
+
   loading.value = true
   try {
     if (crid.value !== null) {
@@ -63,7 +70,6 @@ const handleSubmit = async () => {
       order.value.doc = docURL
     }
     order.value.name = order.value.name.toUpperCase()
-
     const result = orderId.value
       ? await orders.update(order.value, orderId.value)
       : await orders.create(order.value)
@@ -100,6 +106,7 @@ const handleSubmit = async () => {
     <Alert :show="order.status === 'Aguardando' && orderId != null" type="info">
       <p>Solicitação aguardando parecer da coordenação</p>
     </Alert>
+
     <div>
       <form @submit.prevent="handleSubmit">
         <div class="grid grid-cols-1 gap-6 mt-4 sm:grid-cols-2">
@@ -157,6 +164,9 @@ const handleSubmit = async () => {
             <fieldset
               v-if="setting"
               class="py-4 px-2 mb-4 border border-base-300 rounded-md col-span-2"
+              :class="
+                order.problems && order.problems.length === 0 && 'border-error'
+              "
             >
               <legend class="text-content text-sm font-semibold px-2">
                 Qual(is) irregularidade(s) da CRID deseja regularizar?
@@ -193,6 +203,7 @@ const handleSubmit = async () => {
               class="textarea textarea-bordered w-full"
               placeholder="Jusquifique o parecer"
               v-model="order.justification"
+              required
             ></textarea>
           </div>
 
@@ -263,6 +274,11 @@ const handleSubmit = async () => {
             </label>
           </div>
         </div>
+
+        <Alert :show="errors.length > 0" type="error" class="my-4">
+          <p v-for="(error, index) in errors" :key="index">{{ error }}</p>
+        </Alert>
+
         <div class="py-4">
           <button
             type="submit"
