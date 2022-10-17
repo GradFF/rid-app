@@ -7,6 +7,9 @@ import { nanoid } from 'nanoid'
 import { useRoute, useRouter } from 'vue-router'
 import Alert from './shared/Alert.vue'
 
+const { isActiveSetting } = settings
+const semesterActive = ref(null)
+
 const router = useRouter()
 const route = useRoute()
 
@@ -21,6 +24,11 @@ const orderId = computed(() => route.params.id || null)
 
 onMounted(async () => {
   setting.value = await settings.find()
+  semesterActive.value = await isActiveSetting()
+  console.log(semesterActive.value.length)
+  if (!semesterActive.value || semesterActive.value.length === 0) {
+    return router.replace({ name: 'home' })
+  }
 
   orderId.value
     ? (order.value = await orders.find(orderId.value))

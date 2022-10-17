@@ -1,9 +1,11 @@
 <script setup>
-import { ref } from 'vue'
+import { onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
-import { orders } from '../services'
-
+import { orders, settings } from '../services'
 import Navbar from './shared/Navbar.vue'
+
+const { isActiveSetting } = settings
+const semesterActive = ref(null)
 
 const router = useRouter()
 
@@ -28,6 +30,10 @@ const handleSubmit = async () => {
     loading.value = false
   }
 }
+
+onMounted(async () => {
+  semesterActive.value = await isActiveSetting()
+})
 </script>
 <template>
   <div class="min-h-screen bg-base-200">
@@ -36,18 +42,23 @@ const handleSubmit = async () => {
       <div class="hero-content text-center">
         <div class="max-w-md">
           <h1 class="text-2xl font-bold mb-8">
-            Regularização de inscrição em disciplina 2022-2
+            Regularização de inscrição em disciplina
+            {{ semesterActive && semesterActive[0].title }}
           </h1>
 
-          <RouterLink :to="{ name: 'create' }" class="btn btn-primary mb-4">
-            Solicitar Regularização
-          </RouterLink>
-          <div class="divider">OU</div>
-
+          <!-- BTN -->
+          <template v-if="semesterActive && semesterActive.length > 0">
+            <RouterLink :to="{ name: 'create' }" class="btn btn-primary mb-4">
+              Solicitar Regularização
+            </RouterLink>
+            <div class="divider">OU</div>
+          </template>
           <p>
             Infome no campo abaixo o código de acesso que recebeu quando
             preencheu o requerimento.
           </p>
+
+          <!-- SEARCH -->
           <form @submit.prevent="handleSubmit">
             <div class="form-control mt-4">
               <div class="flex items-center space-x-2">
