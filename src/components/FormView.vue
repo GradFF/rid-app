@@ -25,10 +25,10 @@ const orderId = computed(() => route.params.id || null)
 onMounted(async () => {
   setting.value = await settings.find()
   semesterActive.value = await isActiveSetting()
-  console.log(semesterActive.value.length)
-  if (!semesterActive.value || semesterActive.value.length === 0) {
-    return router.replace({ name: 'home' })
-  }
+  // console.log(semesterActive.value.length)
+  // if (!semesterActive.value || semesterActive.value.length === 0) {
+  //   return router.replace({ name: 'home' })
+  // }
 
   orderId.value
     ? (order.value = await orders.find(orderId.value))
@@ -111,15 +111,19 @@ const handleSubmit = async () => {
     </div>
 
     <!-- Alert -->
-    <Alert :show="order.status === 'Deferido'" type="success">
-      <p class="text-lg font-bold">Solicitação Deferida.</p>
+    <Alert
+      :show="order.status === 'Deferido' || order.status === 'Deferido/Parcial'"
+      type="success"
+    >
+      <!-- <p class="text-lg font-bold">Solicitação {{ order.status }}</p> -->
+      <p class="mb-4">{{ order.opinio }}</p>
       <p v-if="order.provided">
         Autorização efetivada no SIGA. Verifique sua CRID para confirmar
       </p>
       <p v-else>A autorização será lançada na sua CRID em breve.</p>
     </Alert>
     <Alert :show="order.status === 'Indeferido'" type="error">
-      <p class="text-lg font-bold">Solicitação Indeferida.</p>
+      <!-- <p class="text-lg font-bold">Solicitação {{ order.status }}.</p> -->
       <p>{{ order.opinio }}</p>
     </Alert>
     <Alert :show="order.status === 'Aguardando' && orderId != null" type="info">
@@ -299,15 +303,17 @@ const handleSubmit = async () => {
         </Alert>
 
         <div class="py-4">
-          <button
-            type="submit"
-            class="btn btn-primary px-6 disabled:cursor-not-allowed"
-            :class="loading && 'loading'"
-            v-if="order.status && order.status === 'Aguardando'"
-            :disabled="!order.term || loading"
-          >
-            Salvar
-          </button>
+          <div v-if="semesterActive?.length">
+            <button
+              type="submit"
+              class="btn btn-primary px-6 disabled:cursor-not-allowed"
+              :class="loading && 'loading'"
+              v-if="order.status && order.status === 'Aguardando'"
+              :disabled="!order.term || loading"
+            >
+              Salvar
+            </button>
+          </div>
 
           <!-- alert -->
           <Alert

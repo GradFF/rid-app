@@ -41,9 +41,12 @@ onMounted(async () => {
     <div class="hero mt-12">
       <div class="hero-content text-center">
         <div class="max-w-md">
-          <h1 class="text-2xl font-bold mb-8">
+          <h1 v-if="semesterActive?.length" class="text-2xl font-bold mb-8">
             Regularização de inscrição em disciplina
-            {{ semesterActive && semesterActive[0].title }}
+            {{ semesterActive && semesterActive[0]?.title }}
+          </h1>
+          <h1 v-else class="text-2xl font-bold mb-4">
+            Período de regularização de inscrição em disciplina encerrado.
           </h1>
 
           <!-- BTN -->
