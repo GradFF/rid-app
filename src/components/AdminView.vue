@@ -34,7 +34,7 @@ watch(
 <template>
   <div class="container mx-auto px-4 pb-12">
     <Navbar @search="showFilter = true" />
-    <h1 class="text-3xl font-bold my-8">Solicitações</h1>
+    <h1 class="text-3xl font-bold my-8">Solicitações - {{ orders?.length }}</h1>
 
     <FilterModal @close="showFilter = false" :is-open="showFilter" />
     <!-- SEARCH -->
