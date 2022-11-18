@@ -2,10 +2,10 @@
 import { storeToRefs } from 'pinia'
 import { onMounted, ref, watch, watchEffect } from 'vue'
 import { useOrderStore } from '../stores/order'
+import { settings } from '../services'
 import Navbar from './shared/Navbar.vue'
 import Table from './shared/orders/Table.vue'
 import FilterModal from './shared/orders/FilterModal.vue'
-import { settings } from '../services'
 
 const store = useOrderStore()
 const { filters, orders } = storeToRefs(store)

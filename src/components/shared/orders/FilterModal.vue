@@ -1,7 +1,8 @@
 <script setup>
 import { storeToRefs } from 'pinia'
-import { ref } from 'vue'
-import { useOrderStore } from '../../../stores/order'
+import { onMounted, ref } from 'vue'
+import { useOrderStore } from '@/stores/order'
+import { settings } from '@/services'
 import Alert from '../Alert.vue'
 
 defineProps({
@@ -11,6 +12,7 @@ defineProps({
 const emit = defineEmits(['close'])
 const error = ref(null)
 const loading = ref(false)
+const setting = ref(null)
 
 const handleFilter = async () => {
   error.value = null
@@ -36,6 +38,10 @@ const close = () => {
 
 const store = useOrderStore()
 const { filters } = storeToRefs(store)
+
+onMounted(async () => {
+  setting.value = await settings.find()
+})
 </script>
 <template>
   <div>
@@ -58,7 +64,7 @@ const { filters } = storeToRefs(store)
 
         <h3 class="text-lg font-bold mb-6">Filtrar Solicitações</h3>
 
-        <fieldset class="p-4 mb-4 border border-base-200 rounded-md">
+        <fieldset class="p-2 mb-2 border border-base-200 rounded-md">
           <legend class="text-content text-sm font-semibold">Curso</legend>
           <div
             class="form-control"
@@ -77,20 +83,23 @@ const { filters } = storeToRefs(store)
             </label>
           </div>
         </fieldset>
-        <fieldset class="p-4 mb-4 border border-base-200 rounded-md">
+        <fieldset
+          class="p-2 mb-2 border border-base-200 rounded-md"
+          v-if="setting"
+        >
           <legend class="text-content text-sm font-semibold">Status</legend>
           <div
             class="form-control"
-            v-for="label in ['Aguardando', 'Deferido', 'Indeferido']"
-            :key="label"
+            v-for="item in setting.status"
+            :key="item.title"
           >
-            <label class="label cursor-pointer">
-              <span class="label-text">{{ label }}</span>
+            <label class="label cursor-pointer" v-if="item.show">
+              <span class="label-text">{{ item.title }}</span>
               <input
                 type="checkbox"
                 class="checkbox"
                 v-model="filters.status"
-                :value="label"
+                :value="item.title"
               />
             </label>
           </div>

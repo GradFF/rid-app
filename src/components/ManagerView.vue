@@ -10,7 +10,7 @@ const router = useRouter()
 const route = useRoute()
 
 const order = ref({})
-const setting = ref(null)
+const setting = ref(null) 
 const error = ref(null)
 const loading = ref(false)
 const loadingForm = ref(false)

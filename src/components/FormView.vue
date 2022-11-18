@@ -115,7 +115,7 @@ const handleSubmit = async () => {
       :show="order.status === 'Deferido' || order.status === 'Deferido/Parcial'"
       type="success"
     >
-      <!-- <p class="text-lg font-bold">Solicitação {{ order.status }}</p> -->
+      <p class="text-lg font-bold">Solicitação {{ order.status }}</p>
       <p class="mb-4">{{ order.opinio }}</p>
       <p v-if="order.provided">
         Autorização efetivada no SIGA. Verifique sua CRID para confirmar
@@ -123,7 +123,7 @@ const handleSubmit = async () => {
       <p v-else>A autorização será lançada na sua CRID em breve.</p>
     </Alert>
     <Alert :show="order.status === 'Indeferido'" type="error">
-      <!-- <p class="text-lg font-bold">Solicitação {{ order.status }}.</p> -->
+      <p class="text-lg font-bold">Solicitação {{ order.status }}.</p>
       <p>{{ order.opinio }}</p>
     </Alert>
     <Alert :show="order.status === 'Aguardando' && orderId != null" type="info">
