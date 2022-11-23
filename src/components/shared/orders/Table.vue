@@ -90,14 +90,14 @@ const getColors = value => {
       </table>
     </div>
     <div class="flex justify-center py-4">
-      <button
+      <!-- <button
         type="button"
         class="btn btn-primary btn-sm"
         @click="store.loadMore"
         v-if="store.btnLoadMoreVisible"
       >
         Exibir mais...
-      </button>
+      </button> -->
       <!-- <p v-else>Não há mais registros para exibir.</p> -->
     </div>
   </div>

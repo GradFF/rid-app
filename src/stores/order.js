@@ -33,14 +33,14 @@ export const useOrderStore = defineStore('order', () => {
         where('course', '==', filters.course),
         where('status', 'in', filters.status),
         orderBy('name'),
-        limit(lmt.value)
+        // limit(lmt.value)
       )
     } else {
       q = query(
         collection(db, 'orders'),
         where('status', 'in', filters.status),
         orderBy('name'),
-        limit(lmt.value)
+        // limit(lmt.value)
       )
     }
 
@@ -59,16 +59,16 @@ export const useOrderStore = defineStore('order', () => {
         where('course', '==', filters.course),
         where('status', 'in', filters.status),
         orderBy('name'),
-        startAfter(lastDocument.value),
-        limit(lmt.value)
+        // startAfter(lastDocument.value),
+        // limit(lmt.value)
       )
     } else {
       q = query(
         collection(db, 'orders'),
         where('status', 'in', filters.status),
         orderBy('name'),
-        startAfter(lastDocument.value),
-        limit(lmt.value)
+        // startAfter(lastDocument.value),
+        // limit(lmt.value)
       )
     }
 
@@ -95,7 +95,7 @@ export const useOrderStore = defineStore('order', () => {
           filters.name && filters.name.toUpperCase() + '\uf8ff'
         ),
         orderBy('name'),
-        limit(lmt.value)
+        // limit(lmt.value)
       )
       await getDocs(q).then(snapshot => {
         orders.value = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }))
